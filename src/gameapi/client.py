@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import List, Optional
 
 from ._base import _BaseGameAPI
+from .games.registry import supported_games
 from .models import Leaderboard, Match, Player
 
 
@@ -39,5 +40,4 @@ class GameAPI(_BaseGameAPI):
         self.close()
 
     def __repr__(self) -> str:
-        games = supported_games()
-        return f"GameAPI(games={games}, cache={self.cache_enabled})"
+        return f"GameAPI(games={supported_games()}, cache={self.cache_enabled})"

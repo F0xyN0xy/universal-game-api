@@ -38,6 +38,7 @@ def test_player_sync(chess_profile, chess_stats):
     assert player.rank.tier == "GM"
     assert player.rank.rating == 2800
     assert player.stats.wins == 600
+    assert player.game_data is not None
     assert player.game_data.title == "GM"
     assert player.game_data.ratings["blitz"].rating == 3200
     api.close()

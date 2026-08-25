@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gameapi"
-version = "0.1.0"
+version = "0.2.0"
 description = "A unified, developer-friendly Python interface for public game data and statistics."
 readme = "README.md"
 license = { text = "MIT" }
@@ -12,7 +12,7 @@ requires-python = ">=3.9"
 authors = [
     { name = "Universal Game API Contributors" }
 ]
-keywords = ["games", "api", "gaming", "statistics", "chess", "rocket-league"]
+keywords = ["games", "api", "gaming", "statistics", "chess", "rocket-league", "lichess"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -40,10 +40,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/F0xyN0xy/gameapi"
-Documentation = "https://github.com/F0xyN0xy/gameapi#readme"
-Issues = "https://github.com/F0xyN0xy/gameapi/issues"
-Changelog = "https://github.com/F0xyN0xy/gameapi/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/F0xyN0xy/universal-game-api"
+Documentation = "https://github.com/F0xyN0xy/universal-game-api#readme"
+Issues = "https://github.com/F0xyN0xy/universal-game-api/issues"
+Changelog = "https://github.com/F0xyN0xy/universal-game-api/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gameapi"]
@@ -51,6 +51,9 @@ packages = ["src/gameapi"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+markers = [
+    "live: marks tests that hit real APIs (slow, may fail due to network/rate limits)",
+]
 
 [tool.mypy]
 python_version = "3.10"

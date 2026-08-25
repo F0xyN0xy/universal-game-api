@@ -1,4 +1,10 @@
-"""Chess.com game integration."""
+"""Chess.com game integration.
+
+Data source: the free, public Chess.com "Published-Data API"
+(https://www.chess.com/news/view/published-data-api). No API key is
+required. This integration is not affiliated with, endorsed by, or
+sponsored by Chess.com.
+"""
 
 from __future__ import annotations
 

@@ -1,16 +1,9 @@
-"""Shared setup/resolution logic for GameAPI and AsyncGameAPI.
-
-Both the sync and async clients need identical configuration handling
-(API keys, caching, HTTP client construction) and identical integration
-lookup. Keeping that logic here means the sync/async client classes only
-need to differ in how they *call* an integration's methods, not in how
-they're constructed.
-"""
+"""Shared setup/resolution logic for GameAPI and AsyncGameAPI."""
 
 from __future__ import annotations
 
 import os
-from typing import List, Optional
+from typing import Optional
 
 from .cache import MemoryCache
 from .exceptions import GameNotSupportedError

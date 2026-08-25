@@ -68,9 +68,14 @@ class RateLimitError(GameAPIError):
             ``None`` if the upstream response did not include it.
     """
 
-    def __init__(self, message: str = "Rate limit exceeded.", retry_after: Optional[float] = None) -> None:
+    def __init__(
+        self, message: str = "Rate limit exceeded.", retry_after: Optional[float] = None
+    ) -> None:
         self.retry_after = retry_after
         super().__init__(message)
+
+    def __repr__(self) -> str:
+        return f"RateLimitError(retry_after={self.retry_after!r}, message={self.message!r})"
 
 
 class APIUnavailableError(GameAPIError):
@@ -84,5 +89,7 @@ class APIUnavailableError(GameAPIError):
 class InvalidResponseError(GameAPIError):
     """Raised when the upstream API returns a response gameapi cannot parse."""
 
-    def __init__(self, message: str = "Received an invalid or unparsable response from the API.") -> None:
+    def __init__(
+        self, message: str = "Received an invalid or unparsable response from the API."
+    ) -> None:
         super().__init__(message)

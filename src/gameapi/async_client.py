@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import List, Optional
 
 from ._base import _BaseGameAPI
+from .games.registry import supported_games
 from .models import Leaderboard, Match, Player
 
 
@@ -36,5 +37,4 @@ class AsyncGameAPI(_BaseGameAPI):
         await self.aclose()
 
     def __repr__(self) -> str:
-        from .games.registry import supported_games
         return f"AsyncGameAPI(games={supported_games()}, cache={self.cache_enabled})"

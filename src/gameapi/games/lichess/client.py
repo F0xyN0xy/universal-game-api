@@ -6,14 +6,13 @@ Data source: the free, public Lichess API
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from ...exceptions import InvalidResponseError, PlayerNotFoundError
-from ...models import Leaderboard, LeaderboardEntry, Match, Player, PlayerStats, Rank
+from ...models import Leaderboard, LeaderboardEntry, Player, PlayerStats, Rank
 from ..base import GameIntegration
 from . import endpoints
-from .models import LichessMatchData, LichessPlayerData, LichessRatingSummary
+from .models import LichessPlayerData, LichessRatingSummary
 
 _USER_AGENT = "gameapi/0.2.0 (+https://github.com/F0xyN0xy/universal-game-api)"
 _ACCEPT = "application/vnd.lichess.v5+json"

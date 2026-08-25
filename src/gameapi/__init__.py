@@ -25,7 +25,7 @@ from .exceptions import (
 from .games.registry import supported_games
 from .models import Leaderboard, LeaderboardEntry, Match, Player, PlayerStats, Rank
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "GameAPI",

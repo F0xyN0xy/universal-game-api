@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from gameapi import GameAPI, GameNotSupportedError
 from gameapi.games.registry import supported_games, register_game, GAME_REGISTRY
 from gameapi.games.base import GameIntegration
@@ -42,6 +44,3 @@ def test_register_game_decorator():
     assert "fake_game" in GAME_REGISTRY
     # cleanup
     del GAME_REGISTRY["fake_game"]
-
-
-import pytest
