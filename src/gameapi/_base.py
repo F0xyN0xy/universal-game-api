@@ -1,0 +1,62 @@
+"""Shared setup/resolution logic for GameAPI and AsyncGameAPI.
+
+Both the sync and async clients need identical configuration handling
+(API keys, caching, HTTP client construction) and identical integration
+lookup. Keeping that logic here means the sync/async client classes only
+need to differ in how they *call* an integration's methods, not in how
+they're constructed.
+"""
+
+from __future__ import annotations
+
+import os
+from typing import Optional
+
+from .cache import MemoryCache
+from .exceptions import GameNotSupportedError
+from .games.base import GameIntegration
+from .games.registry import GAME_REGISTRY, supported_games
+from .http import HTTPClient
+
+_ENV_API_KEY = "GAMEAPI_API_KEY"
+
+
+class _BaseGameAPI:
+    """Common configuration and integration resolution for both clients.
+
+    Attributes:
+        api_key: A default API key applied to any integration that needs
+            one and wasn't given a more specific key. Falls back to the
+            ``GAMEAPI_API_KEY`` environment variable if not passed explicitly.
+        cache_enabled: Whether response caching is turned on.
+        cache_ttl: Default cache lifetime, in seconds.
+    """
+
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        cache: bool = False,
+        cache_ttl: float = 60.0,
+        timeout: float = 10.0,
+        max_retries: int = 2,
+    ) -> None:
+        self.api_key = api_key or os.environ.get(_ENV_API_KEY)
+        self.cache_enabled = cache
+        self.cache_ttl = cache_ttl
+
+        self._http = HTTPClient(timeout=timeout, max_retries=max_retries)
+        self._cache = MemoryCache(default_ttl=cache_ttl) if cache else None
+        self._integrations: dict = {}
+
+    def _resolve(self, game: str) -> GameIntegration:
+        integration = self._integrations.get(game)
+        if integration is not None:
+            return integration
+
+        integration_cls = GAME_REGISTRY.get(game)
+        if integration_cls is None:
+            raise GameNotSupportedError(game, supported=supported_games())
+
+        integration = integration_cls(self._http, api_key=self.api_key, cache=self._cache)
+        self._integrations[game] = integration
+        return integration
