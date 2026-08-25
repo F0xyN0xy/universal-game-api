@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.2.0] — 2026-08-25
+## [0.1.0] — 2026-08-25
 
 ### Added
 - **Lichess integration** (`lichess` slug) — player profiles and leaderboards via the public Lichess API.
@@ -23,11 +23,9 @@ All notable changes to this project will be documented in this file.
 - **Pylance warnings** — guarded `game_data` access in tests to satisfy `reportOptionalMemberAccess`.
 
 ### Changed
-- Bumped version to `0.2.0`.
+- Bumped version to `0.1.0`.
 - `pyproject.toml` now includes `lichess` in keywords and classifiers.
 - `pytest.ini_options` adds a `live` marker for optional live API tests.
-
-## [0.1.0] — 2026-08-20
 
 ### Added
 - Initial release with Chess.com integration.

@@ -4,6 +4,17 @@
 
 `gameapi` is a Python library that unifies public game APIs behind a single, consistent interface. Instead of learning a new client for every game, you write the same code for Chess.com, Lichess, and whatever comes next.
 
+## PyPI
+
+Go to [PyPI](https://pypi.org/project/universal-game-api/) and write an email to be invited as a collaborator.
+
+
+## Installation
+
+```bash
+pip install gameapi
+```
+
 ```python
 from gameapi import GameAPI
 
@@ -220,7 +231,7 @@ python src/demo_project/dashboard.py chess_com hikaru magnuscarlsen
 
 ## Contributing
 
-See `CONTRIBUTING.md` for how to add a new game integration. The pattern is:
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to add a new game integration. The pattern is:
 
 1. Create `src/gameapi/games/<game>/`
 2. Subclass `GameIntegration`
@@ -232,7 +243,7 @@ No changes to `client.py` or `async_client.py` are needed.
 
 ## License
 
-MIT
+[MIT](LICENSE)
 
 ## Legal
 
