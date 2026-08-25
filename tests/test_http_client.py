@@ -48,7 +48,21 @@ def test_429_retries_then_raises_rate_limit_error_with_retry_after():
     with pytest.raises(RateLimitError) as exc_info:
         client.request("GET", URL)
     assert exc_info.value.retry_after == 5.0
-    assert route.call_count == 3  # initial + 2 retries
+    assert route.call_count == 3
+
+
+@respx.mock
+def test_429_uses_retry_after_header_when_present():
+    route = respx.get(URL).mock(
+        side_effect=[
+            httpx.Response(429, headers={"Retry-After": "0.01"}),
+            httpx.Response(200, json={"ok": True}),
+        ]
+    )
+    client = HTTPClient(max_retries=2)
+    result = client.request("GET", URL)
+    assert result == {"ok": True}
+    assert route.call_count == 2
 
 
 @respx.mock
@@ -91,7 +105,14 @@ async def test_async_request_returns_json():
     await client.aclose()
 
 
+@respx.mock
 def test_headers_are_merged():
     client = HTTPClient(base_headers={"X-Base": "1"})
     merged = client._merged_headers({"X-Extra": "2"})
     assert merged == {"X-Base": "1", "X-Extra": "2"}
+
+
+def test_client_passes_base_headers_to_httpx():
+    client = HTTPClient(base_headers={"X-Test": "hello"})
+    assert client._sync.headers["X-Test"] == "hello"
+    client.close()

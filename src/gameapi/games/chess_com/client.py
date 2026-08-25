@@ -1,15 +1,4 @@
-"""Chess.com game integration.
-
-Data source: the free, public Chess.com "Published-Data API"
-(https://www.chess.com/news/view/published-data-api). No API key is
-required. This integration is not affiliated with, endorsed by, or
-sponsored by Chess.com.
-
-Chess.com does not offer a region-scoped leaderboard in its public API, so
-``get_leaderboard``'s ``region`` parameter is accepted for interface
-consistency but currently has no effect on the (global) results returned —
-this is documented rather than silently faked.
-"""
+"""Chess.com game integration."""
 
 from __future__ import annotations
 
@@ -22,10 +11,8 @@ from ..base import GameIntegration
 from . import endpoints
 from .models import ChessComMatchData, ChessComPlayerData, ChessComRatingSummary
 
-# Chess.com asks API consumers to identify their application.
-_USER_AGENT = "gameapi/0.1.0 (+https://github.com/example/gameapi)"
+_USER_AGENT = "gameapi/0.2.0 (+https://github.com/F0xyN0xy/universal-game-api)"
 
-# Maps Chess.com's stats-endpoint keys to a short time-control label.
 _TIME_CONTROL_KEYS = {
     "chess_bullet": "bullet",
     "chess_blitz": "blitz",
@@ -33,11 +20,7 @@ _TIME_CONTROL_KEYS = {
     "chess_daily": "daily",
 }
 
-# Which time control's rating is used to populate the unified Rank model.
 _PRIMARY_TIME_CONTROL = "chess_rapid"
-
-# Leaderboard category used by get_leaderboard() when the caller doesn't
-# need per-time-control control over the result.
 _DEFAULT_LEADERBOARD_CATEGORY = "live_blitz"
 
 
@@ -52,29 +35,25 @@ class ChessComIntegration(GameIntegration):
     def _headers(self) -> Dict[str, str]:
         return {"User-Agent": _USER_AGENT, "Accept": "application/json"}
 
-    # -- player -------------------------------------------------------------------
-
     def get_player(self, identifier: str) -> Player:
         cached = self._cache_get(f"player:{identifier}")
         if cached is not None:
-            return cached
+            return cached  # type: ignore[return-value]
 
         profile = self._fetch_profile(identifier)
         stats = self._fetch_stats(identifier)
         player = self._build_player(identifier, profile, stats)
-
         self._cache_set(f"player:{identifier}", player, ttl=60)
         return player
 
     async def get_player_async(self, identifier: str) -> Player:
         cached = self._cache_get(f"player:{identifier}")
         if cached is not None:
-            return cached
+            return cached  # type: ignore[return-value]
 
         profile = await self._fetch_profile_async(identifier)
         stats = await self._fetch_stats_async(identifier)
         player = self._build_player(identifier, profile, stats)
-
         self._cache_set(f"player:{identifier}", player, ttl=60)
         return player
 
@@ -100,7 +79,6 @@ class ChessComIntegration(GameIntegration):
                 "GET", endpoints.player_stats_url(identifier), headers=self._headers()
             )
         except InvalidResponseError:
-            # A profile can exist with no stats yet (e.g. brand-new account).
             return {}
 
     async def _fetch_stats_async(self, identifier: str) -> Dict[str, Any]:
@@ -177,8 +155,6 @@ class ChessComIntegration(GameIntegration):
             avatar_url=profile.get("avatar"),
         )
 
-    # -- matches ------------------------------------------------------------------
-
     def get_matches(self, identifier: str, limit: int = 20) -> List[Match]:
         archives = self._fetch_archives(identifier)
         games: List[Dict[str, Any]] = []
@@ -222,7 +198,6 @@ class ChessComIntegration(GameIntegration):
     ) -> List[Match]:
         matches: List[Match] = []
         lowered = identifier.lower()
-        # Most recent games are at the end of each monthly archive.
         for raw in reversed(games):
             if len(matches) >= limit:
                 break
@@ -255,8 +230,6 @@ class ChessComIntegration(GameIntegration):
             )
         return matches
 
-    # -- leaderboard ---------------------------------------------------------------
-
     def get_leaderboard(self, region: Optional[str] = None) -> Leaderboard:
         payload = self.http.request("GET", endpoints.leaderboards_url(), headers=self._headers())
         return self._build_leaderboard(payload, region)
@@ -281,13 +254,12 @@ class ChessComIntegration(GameIntegration):
 
 
 def _normalize_result(chess_com_result: Optional[str]) -> str:
-    """Map Chess.com's granular result strings to gameapi's win/loss/draw/unknown."""
     if chess_com_result is None:
         return "unknown"
     if chess_com_result == "win":
         return "win"
-    if chess_com_result in {"agreed", "repetition", "stalemate", "insufficient", "50move", "timevsinsufficient"}:
+    if chess_com_result in {
+        "agreed", "repetition", "stalemate", "insufficient", "50move", "timevsinsufficient"
+    }:
         return "draw"
-    # Anything else (checkmated, resigned, timeout, abandoned, ...) is a loss
-    # from the perspective of the player who received that result string.
     return "loss"

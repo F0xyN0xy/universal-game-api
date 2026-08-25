@@ -1,11 +1,4 @@
-"""URL builders for the public Chess.com API.
-
-Reference: https://www.chess.com/news/view/published-data-api
-
-The Chess.com published-data API is free and requires no API key, but
-Chess.com asks integrators to identify themselves with a descriptive
-User-Agent (set by :class:`~gameapi.games.chess_com.client.ChessComIntegration`).
-"""
+"""URL builders for the public Chess.com API."""
 
 from __future__ import annotations
 

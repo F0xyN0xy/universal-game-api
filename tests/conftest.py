@@ -63,6 +63,26 @@ CHESS_LEADERBOARDS = {
     ]
 }
 
+LICHESS_USER = {
+    "id": "drnykterstein",
+    "username": "DrNykterstein",
+    "title": "GM",
+    "perfs": {
+        "blitz": {"games": 1234, "rating": 2800, "rd": 50, "prog": 10},
+        "bullet": {"games": 500, "rating": 2900, "rd": 45, "prog": -5},
+    },
+    "count": {"all": 5000, "rated": 4000, "win": 2500, "loss": 1500, "draw": 1000, "ai": 0},
+    "playTime": {"total": 360000},
+    "profile": {"country": "NO", "location": "Oslo"},
+}
+
+LICHESS_LEADERBOARD = {
+    "users": [
+        {"username": "DrNykterstein", "perfs": {"blitz": {"rating": 2800}}},
+        {"username": "penguingm1", "perfs": {"blitz": {"rating": 2750}}},
+    ]
+}
+
 
 @pytest.fixture
 def chess_profile():
@@ -87,3 +107,13 @@ def chess_games_page():
 @pytest.fixture
 def chess_leaderboards():
     return dict(CHESS_LEADERBOARDS)
+
+
+@pytest.fixture
+def lichess_user():
+    return dict(LICHESS_USER)
+
+
+@pytest.fixture
+def lichess_leaderboard():
+    return dict(LICHESS_LEADERBOARD)

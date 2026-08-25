@@ -1,4 +1,4 @@
-"""Chess.com game integration (free, public, no API key required)."""
+"""Chess.com game integration."""
 
 from .client import ChessComIntegration
 

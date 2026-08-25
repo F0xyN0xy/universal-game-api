@@ -1,4 +1,4 @@
-"""The unified Leaderboard model returned by game integrations that expose rankings."""
+"""The unified Leaderboard model."""
 
 from __future__ import annotations
 
@@ -8,13 +8,7 @@ from typing import List, Optional
 
 @dataclass
 class LeaderboardEntry:
-    """A single row on a leaderboard.
-
-    Attributes:
-        position: The player's rank position on this leaderboard (1-indexed).
-        name: The player's display name/handle.
-        rating: The numeric rating/score backing this position, if known.
-    """
+    """A single row on a leaderboard."""
 
     position: int
     name: str
@@ -23,13 +17,7 @@ class LeaderboardEntry:
 
 @dataclass
 class Leaderboard:
-    """A ranked list of players for a game (optionally scoped to a region/mode).
-
-    Attributes:
-        game: The game identifier this leaderboard belongs to.
-        entries: Ordered leaderboard rows, best rank first.
-        region: The region this leaderboard is scoped to, if applicable.
-    """
+    """A ranked list of players for a game."""
 
     game: str
     entries: List[LeaderboardEntry] = field(default_factory=list)
@@ -40,3 +28,7 @@ class Leaderboard:
 
     def __len__(self) -> int:
         return len(self.entries)
+
+    def top(self, n: int) -> List[LeaderboardEntry]:
+        """Return the top ``n`` entries."""
+        return self.entries[:n]

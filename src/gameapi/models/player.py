@@ -1,4 +1,4 @@
-"""The unified Player model returned by every game integration."""
+"""The unified Player model."""
 
 from __future__ import annotations
 
@@ -10,22 +10,7 @@ from .stats import PlayerStats, Rank
 
 @dataclass
 class Player:
-    """A player profile, normalized across games.
-
-    ``name``, ``game``, ``stats``, and ``rank`` are common fields every
-    integration attempts to populate. Anything that doesn't fit the common
-    model lives on ``game_data``, which is a game-specific dataclass (see
-    each game's ``models.py``, e.g. ``games.chess_com.models.ChessComPlayerData``).
-
-    Attributes:
-        name: The player's display name or handle.
-        game: The game identifier this profile belongs to, e.g. "chess_com".
-        identifier: The original identifier used to look up this player.
-        stats: Common cross-game statistics.
-        rank: Common cross-game rank/rating information.
-        game_data: Game-specific data that has no cross-game equivalent.
-        avatar_url: URL to the player's avatar/profile picture, if available.
-    """
+    """A player profile, normalized across games."""
 
     name: str
     game: str
@@ -34,3 +19,9 @@ class Player:
     rank: Rank = field(default_factory=Rank)
     game_data: Optional[Any] = None
     avatar_url: Optional[str] = None
+
+    def win_rate_pct(self) -> Optional[float]:
+        """Return win rate as a percentage (0-100), or None if unknown."""
+        if self.stats.win_rate is None:
+            return None
+        return round(self.stats.win_rate * 100, 2)

@@ -24,6 +24,11 @@ def test_rate_limit_error_exposes_retry_after():
     assert "slow down" in str(err)
 
 
+def test_rate_limit_error_repr():
+    err = RateLimitError("slow down", retry_after=12.5)
+    assert "RateLimitError" in repr(err)
+
+
 def test_player_not_found_message_includes_context():
     err = PlayerNotFoundError("chess_com", "ghost")
     assert "ghost" in str(err)
@@ -31,10 +36,10 @@ def test_player_not_found_message_includes_context():
 
 
 def test_game_not_supported_lists_supported_games():
-    err = GameNotSupportedError("foo", supported=["chess_com", "minecraft"])
+    err = GameNotSupportedError("foo", supported=["chess_com", "lichess"])
     assert "foo" in str(err)
     assert "chess_com" in str(err)
-    assert "minecraft" in str(err)
+    assert "lichess" in str(err)
 
 
 def test_catch_as_base_class():

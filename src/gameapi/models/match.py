@@ -1,4 +1,4 @@
-"""The unified Match model returned by game integrations that expose match history."""
+"""The unified Match model."""
 
 from __future__ import annotations
 
@@ -9,18 +9,7 @@ from typing import Any, Optional
 
 @dataclass
 class Match:
-    """A single completed match/game, normalized across games.
-
-    Attributes:
-        id: A stable identifier for the match, if the source API provides one
-            (e.g. a game URL or UUID). May be a URL for some games.
-        game: The game identifier this match belongs to.
-        played_at: When the match was played, if known.
-        result: One of "win", "loss", "draw", or "unknown" from the
-            perspective of the queried player.
-        opponent: The opponent's name/handle, if known and applicable.
-        game_data: Game-specific match details that don't fit the common model.
-    """
+    """A single completed match/game, normalized across games."""
 
     id: str
     game: str
@@ -28,3 +17,15 @@ class Match:
     result: str = "unknown"
     opponent: Optional[str] = None
     game_data: Optional[Any] = field(default=None)
+
+    @property
+    def is_win(self) -> bool:
+        return self.result == "win"
+
+    @property
+    def is_loss(self) -> bool:
+        return self.result == "loss"
+
+    @property
+    def is_draw(self) -> bool:
+        return self.result == "draw"

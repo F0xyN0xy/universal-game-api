@@ -1,17 +1,4 @@
-"""The asynchronous public entry point for gameapi.
-
-Example:
-    >>> from gameapi import AsyncGameAPI
-    >>> import asyncio
-    >>>
-    >>> async def main():
-    ...     api = AsyncGameAPI()
-    ...     player = await api.player(game="chess_com", identifier="hikaru")
-    ...     print(player.name, player.rank.rating)
-    ...     await api.aclose()
-    >>>
-    >>> asyncio.run(main())
-"""
+"""The asynchronous public entry point for gameapi."""
 
 from __future__ import annotations
 
@@ -22,27 +9,21 @@ from .models import Leaderboard, Match, Player
 
 
 class AsyncGameAPI(_BaseGameAPI):
-    """Asynchronous client for accessing unified public game data.
-
-    Mirrors :class:`~gameapi.client.GameAPI`'s configuration and method
-    signatures exactly — every method is simply ``await``-ed instead.
-
-    Example:
-        >>> async with AsyncGameAPI() as api:
-        ...     player = await api.player("chess_com", "hikaru")
-    """
+    """Asynchronous client for accessing unified public game data."""
 
     async def player(self, game: str, identifier: str) -> Player:
-        """Async counterpart to :meth:`GameAPI.player`. Same behavior and errors."""
         return await self._resolve(game).get_player_async(identifier)
 
     async def matches(self, game: str, identifier: str, limit: int = 20) -> List[Match]:
-        """Async counterpart to :meth:`GameAPI.matches`. Same behavior and errors."""
         return await self._resolve(game).get_matches_async(identifier, limit=limit)
 
     async def leaderboard(self, game: str, region: Optional[str] = None) -> Leaderboard:
-        """Async counterpart to :meth:`GameAPI.leaderboard`. Same behavior and errors."""
         return await self._resolve(game).get_leaderboard_async(region=region)
+
+    async def compare_players(self, game: str, identifiers: List[str]) -> List[Player]:
+        """Fetch multiple players concurrently."""
+        integration = self._resolve(game)
+        return [await integration.get_player_async(ident) for ident in identifiers]
 
     async def aclose(self) -> None:
         """Release the underlying HTTP connection pool."""
@@ -53,3 +34,7 @@ class AsyncGameAPI(_BaseGameAPI):
 
     async def __aexit__(self, *exc_info: object) -> None:
         await self.aclose()
+
+    def __repr__(self) -> str:
+        from .games.registry import supported_games
+        return f"AsyncGameAPI(games={supported_games()}, cache={self.cache_enabled})"

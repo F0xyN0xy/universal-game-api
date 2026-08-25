@@ -40,10 +40,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/example/gameapi"
-Documentation = "https://github.com/example/gameapi#readme"
-Issues = "https://github.com/example/gameapi/issues"
-Changelog = "https://github.com/example/gameapi/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/F0xyN0xy/gameapi"
+Documentation = "https://github.com/F0xyN0xy/gameapi#readme"
+Issues = "https://github.com/F0xyN0xy/gameapi/issues"
+Changelog = "https://github.com/F0xyN0xy/gameapi/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gameapi"]

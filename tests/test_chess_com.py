@@ -36,8 +36,8 @@ def test_player_sync(chess_profile, chess_stats):
     assert player.name == "hikaru"
     assert player.game == "chess_com"
     assert player.rank.tier == "GM"
-    assert player.rank.rating == 2800  # chess_rapid is the primary rank source
-    assert player.stats.wins == 600  # 100 (rapid) + 500 (blitz)
+    assert player.rank.rating == 2800
+    assert player.stats.wins == 600
     assert player.game_data.title == "GM"
     assert player.game_data.ratings["blitz"].rating == 3200
     api.close()
@@ -88,6 +88,21 @@ def test_matches(chess_archives, chess_games_page):
     api.close()
 
 
+@pytest.mark.asyncio
+@respx.mock
+async def test_matches_async(chess_archives, chess_games_page):
+    respx.get(endpoints.player_archives_url("hikaru")).mock(
+        return_value=httpx.Response(200, json=chess_archives)
+    )
+    for url in chess_archives["archives"]:
+        respx.get(url).mock(return_value=httpx.Response(200, json=chess_games_page))
+
+    api = AsyncGameAPI()
+    matches = await api.matches(game="chess_com", identifier="hikaru", limit=2)
+    assert len(matches) == 2
+    await api.aclose()
+
+
 @respx.mock
 def test_leaderboard(chess_leaderboards):
     respx.get(endpoints.leaderboards_url()).mock(
@@ -103,12 +118,25 @@ def test_leaderboard(chess_leaderboards):
     api.close()
 
 
+@pytest.mark.asyncio
+@respx.mock
+async def test_leaderboard_async(chess_leaderboards):
+    respx.get(endpoints.leaderboards_url()).mock(
+        return_value=httpx.Response(200, json=chess_leaderboards)
+    )
+
+    api = AsyncGameAPI()
+    board = await api.leaderboard(game="chess_com")
+    assert len(board) == 2
+    await api.aclose()
+
+
 @respx.mock
 def test_caching_avoids_second_request(chess_profile, chess_stats):
     profile_route = respx.get(endpoints.player_profile_url("hikaru")).mock(
         return_value=httpx.Response(200, json=chess_profile)
     )
-    respx.get(endpoints.player_stats_url("hikaru")).mock(
+    stats_route = respx.get(endpoints.player_stats_url("hikaru")).mock(
         return_value=httpx.Response(200, json=chess_stats)
     )
 
@@ -117,6 +145,7 @@ def test_caching_avoids_second_request(chess_profile, chess_stats):
     api.player(game="chess_com", identifier="hikaru")
 
     assert profile_route.call_count == 1
+    assert stats_route.call_count == 1
     api.close()
 
 

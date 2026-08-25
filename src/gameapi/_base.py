@@ -10,7 +10,7 @@ they're constructed.
 from __future__ import annotations
 
 import os
-from typing import Optional
+from typing import List, Optional
 
 from .cache import MemoryCache
 from .exceptions import GameNotSupportedError
@@ -22,15 +22,7 @@ _ENV_API_KEY = "GAMEAPI_API_KEY"
 
 
 class _BaseGameAPI:
-    """Common configuration and integration resolution for both clients.
-
-    Attributes:
-        api_key: A default API key applied to any integration that needs
-            one and wasn't given a more specific key. Falls back to the
-            ``GAMEAPI_API_KEY`` environment variable if not passed explicitly.
-        cache_enabled: Whether response caching is turned on.
-        cache_ttl: Default cache lifetime, in seconds.
-    """
+    """Common configuration and integration resolution for both clients."""
 
     def __init__(
         self,
@@ -60,3 +52,15 @@ class _BaseGameAPI:
         integration = integration_cls(self._http, api_key=self.api_key, cache=self._cache)
         self._integrations[game] = integration
         return integration
+
+    def game_info(self, game: str) -> dict:
+        """Return metadata about a registered integration."""
+        integration_cls = GAME_REGISTRY.get(game)
+        if integration_cls is None:
+            raise GameNotSupportedError(game, supported=supported_games())
+        return {
+            "slug": integration_cls.slug,
+            "requires_api_key": integration_cls.requires_api_key,
+            "source_name": integration_cls.source_name,
+            "source_url": integration_cls.source_url,
+        }
