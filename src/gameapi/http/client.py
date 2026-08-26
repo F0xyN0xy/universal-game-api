@@ -131,6 +131,7 @@ class HTTPClient:
         *,
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
+        json: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         merged_headers = self._merged_headers(headers)
         last_exc: Optional[Exception] = None
@@ -139,7 +140,7 @@ class HTTPClient:
             response: Optional[httpx.Response] = None
             try:
                 response = self._sync.request(
-                    method, url, params=params, headers=merged_headers
+                    method, url, params=params, headers=merged_headers, json=json
                 )
             except httpx.TimeoutException as exc:
                 last_exc = APIUnavailableError("Request timed out.")
@@ -170,6 +171,7 @@ class HTTPClient:
         *,
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
+        json: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         merged_headers = self._merged_headers(headers)
         last_exc: Optional[Exception] = None
@@ -178,7 +180,7 @@ class HTTPClient:
             response: Optional[httpx.Response] = None
             try:
                 response = await self._async.request(
-                    method, url, params=params, headers=merged_headers
+                    method, url, params=params, headers=merged_headers, json=json
                 )
             except httpx.TimeoutException as exc:
                 last_exc = APIUnavailableError("Request timed out.")

@@ -7,10 +7,12 @@ from typing import Dict, Type
 from .base import GameIntegration
 from .chess_com.client import ChessComIntegration
 from .lichess.client import LichessIntegration
+from .osu.client import OsuIntegration
 
 GAME_REGISTRY: Dict[str, Type[GameIntegration]] = {
     ChessComIntegration.slug: ChessComIntegration,
     LichessIntegration.slug: LichessIntegration,
+    OsuIntegration.slug: OsuIntegration,
 }
 
 

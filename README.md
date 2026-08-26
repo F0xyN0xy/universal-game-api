@@ -55,11 +55,37 @@ Common fields (`name`, `stats`, `rank`) are normalized. Anything that doesn't ge
 |-----------|-------------|---------------|--------------------------------------|
 | Chess.com | `chess_com` | No            | Chess.com Published-Data API         |
 | Lichess   | `lichess`   | No            | Lichess Public API                   |
+| osu!      | `osu`       | Yes (OAuth)   | osu! API v2                          |
 
 ```python
 from gameapi import supported_games
-print(supported_games())  # ['chess_com', 'lichess']
+print(supported_games())  # ['chess_com', 'lichess', 'osu']
 ```
+
+### osu!
+
+osu! is the first integration that requires credentials. Create a free
+OAuth application at <https://osu.ppy.sh/home/account/edit> ("New OAuth
+Application" — no redirect URI needed) and pass the Client ID/Secret as a
+single `api_key` string in the form `"<client_id>:<client_secret>"`:
+
+```python
+from gameapi import GameAPI
+
+with GameAPI(api_key="12345:your-client-secret") as api:
+    player = api.player(game="osu", identifier="mrekk")
+    print(player.name, player.rank.rating, player.rank.position)  # mrekk 18000.5 1
+```
+
+gameapi handles the OAuth client-credentials token exchange, caching, and
+refresh for you — you only ever deal in the two credentials above.
+
+osu! has no head-to-head "match" concept like chess does, so
+`api.matches(game="osu", identifier=...)` returns the player's recent play
+history instead, with `result` set to `"win"` for passed plays and
+`"loss"` for failed ones. `leaderboard(game="osu", region="US")` accepts an
+optional ISO country code to get a country's performance rankings instead
+of the global one.
 
 ---
 

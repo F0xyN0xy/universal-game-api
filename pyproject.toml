@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "universal-game-api"
-version = "0.1.0"
+version = "0.2.0"
 description = "A unified, developer-friendly Python interface for public game data and statistics."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -12,7 +12,7 @@ requires-python = ">=3.9"
 authors = [
     { name = "F0xyN0xy", email = "foxynoxy07@proton.me" }
 ]
-keywords = ["games", "api", "gaming", "statistics", "chess", "python", "lichess"]
+keywords = ["games", "api", "gaming", "statistics", "chess", "python", "lichess", "osu"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
