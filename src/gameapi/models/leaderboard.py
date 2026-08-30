@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import List, Optional
 
 
 @dataclass
@@ -12,7 +12,7 @@ class LeaderboardEntry:
 
     position: int
     name: str
-    rating: Optional[float] = None
+    rating: float | None = None
 
 
 @dataclass
@@ -20,15 +20,15 @@ class Leaderboard:
     """A ranked list of players for a game."""
 
     game: str
-    entries: List[LeaderboardEntry] = field(default_factory=list)
-    region: Optional[str] = None
+    entries: list[LeaderboardEntry] = field(default_factory=list)
+    region: str | None = None
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[LeaderboardEntry]:
         return iter(self.entries)
 
     def __len__(self) -> int:
         return len(self.entries)
 
-    def top(self, n: int) -> List[LeaderboardEntry]:
+    def top(self, n: int) -> list[LeaderboardEntry]:
         """Return the top ``n`` entries."""
         return self.entries[:n]

@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] — 2026-08-30
+
+### Changed
+- **Type hints modernized** — migrated from `typing.Optional`, `typing.List`, `typing.Dict`, `typing.Tuple` to modern Python 3.9+ syntax (`X | None`, `list[X]`, `dict[X, Y]`, `tuple[X, Y]`).
+- **Strict type checking** — fixed all mypy strict mode errors (10 manual fixes):
+  - Added missing type arguments to generic types (`list`, `dict`).
+  - Fixed `no-any-return` errors with explicit type annotations.
+  - Added `Iterator[LeaderboardEntry]` return type to `Leaderboard.__iter__`.
+- **Dependencies updated** — bumped `httpx` to `>=0.27.0` and dev dependencies (`pytest>=8.0`, `mypy>=1.11`, `ruff>=0.6`).
+- **Package metadata enhanced**:
+  - Added keywords: `esports`, `leaderboard`.
+  - Added classifiers: `Framework :: AsyncIO`, `Framework :: Pytest`.
+  - Added URLs: `Repository`, `Bug Tracker`.
+- **Code quality** — 239 linting issues auto-fixed by ruff.
+
+### Technical
+- Codebase now passes `mypy --strict` with zero errors.
+- All 64 tests verified passing after type modernization.
+- No breaking changes to public API — fully backward compatible.
+
 ## [0.2.0] — 2026-08-26
 
 ### Added

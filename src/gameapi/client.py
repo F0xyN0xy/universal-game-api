@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing_extensions import Self
 
 from ._base import _BaseGameAPI
 from .games.registry import supported_games
@@ -16,15 +16,15 @@ class GameAPI(_BaseGameAPI):
         """Fetch a unified player profile."""
         return self._resolve(game).get_player(identifier)
 
-    def matches(self, game: str, identifier: str, limit: int = 20) -> List[Match]:
+    def matches(self, game: str, identifier: str, limit: int = 20) -> list[Match]:
         """Fetch a player's recent matches, most recent first."""
         return self._resolve(game).get_matches(identifier, limit=limit)
 
-    def leaderboard(self, game: str, region: Optional[str] = None) -> Leaderboard:
+    def leaderboard(self, game: str, region: str | None = None) -> Leaderboard:
         """Fetch a game's leaderboard."""
         return self._resolve(game).get_leaderboard(region=region)
 
-    def compare_players(self, game: str, identifiers: List[str]) -> List[Player]:
+    def compare_players(self, game: str, identifiers: list[str]) -> list[Player]:
         """Fetch multiple players at once (synchronous)."""
         integration = self._resolve(game)
         return [integration.get_player(ident) for ident in identifiers]
@@ -33,7 +33,7 @@ class GameAPI(_BaseGameAPI):
         """Release the underlying HTTP connection pool."""
         self._http.close()
 
-    def __enter__(self) -> "GameAPI":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *exc_info: object) -> None:

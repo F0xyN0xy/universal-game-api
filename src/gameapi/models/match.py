@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -13,10 +13,10 @@ class Match:
 
     id: str
     game: str
-    played_at: Optional[datetime] = None
+    played_at: datetime | None = None
     result: str = "unknown"
-    opponent: Optional[str] = None
-    game_data: Optional[Any] = field(default=None)
+    opponent: str | None = None
+    game_data: Any | None = field(default=None)
 
     @property
     def is_win(self) -> bool:

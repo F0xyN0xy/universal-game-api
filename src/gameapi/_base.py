@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-from typing import Optional
 
 from .cache import MemoryCache
 from .exceptions import GameNotSupportedError
@@ -19,7 +18,7 @@ class _BaseGameAPI:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         cache: bool = False,
         cache_ttl: float = 60.0,
         timeout: float = 10.0,
@@ -31,7 +30,7 @@ class _BaseGameAPI:
 
         self._http = HTTPClient(timeout=timeout, max_retries=max_retries)
         self._cache = MemoryCache(default_ttl=cache_ttl) if cache else None
-        self._integrations: dict = {}
+        self._integrations: dict[str, GameIntegration] = {}
 
     def _resolve(self, game: str) -> GameIntegration:
         integration = self._integrations.get(game)
@@ -46,7 +45,7 @@ class _BaseGameAPI:
         self._integrations[game] = integration
         return integration
 
-    def game_info(self, game: str) -> dict:
+    def game_info(self, game: str) -> dict[str, str | bool]:
         """Return metadata about a registered integration."""
         integration_cls = GAME_REGISTRY.get(game)
         if integration_cls is None:

@@ -6,7 +6,7 @@ Data source: the free, public Lichess API
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ...exceptions import InvalidResponseError, PlayerNotFoundError
 from ...models import Leaderboard, LeaderboardEntry, Player, PlayerStats, Rank
@@ -14,7 +14,7 @@ from ..base import GameIntegration
 from . import endpoints
 from .models import LichessPlayerData, LichessRatingSummary
 
-_USER_AGENT = "gameapi/0.2.0 (+https://github.com/F0xyN0xy/universal-game-api)"
+_USER_AGENT = "gameapi/0.2.1 (+https://github.com/F0xyN0xy/universal-game-api)"
 _ACCEPT = "application/vnd.lichess.v5+json"
 
 
@@ -26,7 +26,7 @@ class LichessIntegration(GameIntegration):
     source_name = "Lichess Public API"
     source_url = "https://lichess.org/api"
 
-    def _headers(self) -> Dict[str, str]:
+    def _headers(self) -> dict[str, str]:
         return {"User-Agent": _USER_AGENT, "Accept": _ACCEPT}
 
     def get_player(self, identifier: str) -> Player:
@@ -49,7 +49,7 @@ class LichessIntegration(GameIntegration):
         self._cache_set(f"player:{identifier}", player, ttl=60)
         return player
 
-    def _fetch_user(self, identifier: str) -> Dict[str, Any]:
+    def _fetch_user(self, identifier: str) -> dict[str, Any]:
         try:
             return self.http.request(
                 "GET", endpoints.user_profile_url(identifier), headers=self._headers()
@@ -57,7 +57,7 @@ class LichessIntegration(GameIntegration):
         except InvalidResponseError as exc:
             raise PlayerNotFoundError(self.slug, identifier) from exc
 
-    async def _fetch_user_async(self, identifier: str) -> Dict[str, Any]:
+    async def _fetch_user_async(self, identifier: str) -> dict[str, Any]:
         try:
             return await self.http.request_async(
                 "GET", endpoints.user_profile_url(identifier), headers=self._headers()
@@ -65,11 +65,11 @@ class LichessIntegration(GameIntegration):
         except InvalidResponseError as exc:
             raise PlayerNotFoundError(self.slug, identifier) from exc
 
-    def _build_player(self, identifier: str, data: Dict[str, Any]) -> Player:
+    def _build_player(self, identifier: str, data: dict[str, Any]) -> Player:
         perfs = data.get("perfs", {})
         count = data.get("count", {})
 
-        ratings: Dict[str, LichessRatingSummary] = {}
+        ratings: dict[str, LichessRatingSummary] = {}
         for perf_name, perf_data in perfs.items():
             if isinstance(perf_data, dict):
                 ratings[perf_name] = LichessRatingSummary(
@@ -129,21 +129,21 @@ class LichessIntegration(GameIntegration):
             avatar_url=None,
         )
 
-    def get_leaderboard(self, region: Optional[str] = None) -> Leaderboard:
+    def get_leaderboard(self, region: str | None = None) -> Leaderboard:
         perf = region if region else "blitz"
         payload = self.http.request(
             "GET", endpoints.leaderboard_url(perf_type=perf, nb=10), headers=self._headers()
         )
         return self._build_leaderboard(payload, perf)
 
-    async def get_leaderboard_async(self, region: Optional[str] = None) -> Leaderboard:
+    async def get_leaderboard_async(self, region: str | None = None) -> Leaderboard:
         perf = region if region else "blitz"
         payload = await self.http.request_async(
             "GET", endpoints.leaderboard_url(perf_type=perf, nb=10), headers=self._headers()
         )
         return self._build_leaderboard(payload, perf)
 
-    def _build_leaderboard(self, payload: Dict[str, Any], perf: str) -> Leaderboard:
+    def _build_leaderboard(self, payload: dict[str, Any], perf: str) -> Leaderboard:
         users = payload.get("users", [])
         entries = [
             LeaderboardEntry(

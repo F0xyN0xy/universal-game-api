@@ -6,10 +6,10 @@ from .player import Player
 from .stats import PlayerStats, Rank
 
 __all__ = [
+    "Leaderboard",
+    "LeaderboardEntry",
+    "Match",
     "Player",
     "PlayerStats",
     "Rank",
-    "Match",
-    "Leaderboard",
-    "LeaderboardEntry",
 ]

@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from ...exceptions import AuthenticationError, InvalidResponseError, PlayerNotFoundError
 from ...models import Leaderboard, LeaderboardEntry, Match, Player, PlayerStats, Rank
@@ -34,7 +34,7 @@ from ..base import GameIntegration
 from . import endpoints
 from .models import OsuPlayerData, OsuScoreData
 
-_USER_AGENT = "gameapi/0.2.0 (+https://github.com/F0xyN0xy/universal-game-api)"
+_USER_AGENT = "gameapi/0.2.1 (+https://github.com/F0xyN0xy/universal-game-api)"
 _TOKEN_EXPIRY_SAFETY_MARGIN = 30  # seconds; refresh a little before actual expiry
 
 
@@ -48,12 +48,12 @@ class OsuIntegration(GameIntegration):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self._access_token: Optional[str] = None
+        self._access_token: str | None = None
         self._token_expires_at: float = 0.0
 
     # -- Authentication -----------------------------------------------------
 
-    def _credentials(self) -> Tuple[str, str]:
+    def _credentials(self) -> tuple[str, str]:
         if not self.api_key or ":" not in self.api_key:
             raise AuthenticationError(
                 "osu! requires an OAuth client id and secret. Create one at "
@@ -67,14 +67,14 @@ class OsuIntegration(GameIntegration):
             )
         return client_id, client_secret
 
-    def _token_headers(self) -> Dict[str, str]:
+    def _token_headers(self) -> dict[str, str]:
         return {
             "User-Agent": _USER_AGENT,
             "Accept": "application/json",
             "Content-Type": "application/json",
         }
 
-    def _token_payload(self) -> Dict[str, str]:
+    def _token_payload(self) -> dict[str, str]:
         client_id, client_secret = self._credentials()
         return {
             "client_id": client_id,
@@ -83,8 +83,8 @@ class OsuIntegration(GameIntegration):
             "scope": "public",
         }
 
-    def _store_token(self, payload: Dict[str, Any]) -> str:
-        token = payload["access_token"]
+    def _store_token(self, payload: dict[str, Any]) -> str:
+        token: str = payload["access_token"]
         expires_in = payload.get("expires_in", 3600)
         self._access_token = token
         self._token_expires_at = time.time() + expires_in - _TOKEN_EXPIRY_SAFETY_MARGIN
@@ -106,7 +106,7 @@ class OsuIntegration(GameIntegration):
         )
         return self._store_token(payload)
 
-    def _headers(self, token: str) -> Dict[str, str]:
+    def _headers(self, token: str) -> dict[str, str]:
         return {
             "User-Agent": _USER_AGENT,
             "Accept": "application/json",
@@ -137,7 +137,7 @@ class OsuIntegration(GameIntegration):
         self._cache_set(f"player:{identifier}", player, ttl=60)
         return player
 
-    def _fetch_user(self, identifier: str, token: str) -> Dict[str, Any]:
+    def _fetch_user(self, identifier: str, token: str) -> dict[str, Any]:
         try:
             return self.http.request(
                 "GET", endpoints.user_url(identifier), headers=self._headers(token)
@@ -145,7 +145,7 @@ class OsuIntegration(GameIntegration):
         except InvalidResponseError as exc:
             raise PlayerNotFoundError(self.slug, identifier) from exc
 
-    async def _fetch_user_async(self, identifier: str, token: str) -> Dict[str, Any]:
+    async def _fetch_user_async(self, identifier: str, token: str) -> dict[str, Any]:
         try:
             return await self.http.request_async(
                 "GET", endpoints.user_url(identifier), headers=self._headers(token)
@@ -153,7 +153,7 @@ class OsuIntegration(GameIntegration):
         except InvalidResponseError as exc:
             raise PlayerNotFoundError(self.slug, identifier) from exc
 
-    def _build_player(self, identifier: str, data: Dict[str, Any]) -> Player:
+    def _build_player(self, identifier: str, data: dict[str, Any]) -> Player:
         stats = data.get("statistics", {}) or {}
         grades = stats.get("grade_counts", {}) or {}
         level = stats.get("level", {}) or {}
@@ -204,7 +204,7 @@ class OsuIntegration(GameIntegration):
 
     # -- Matches (recent play history) -----------------------------------
 
-    def get_matches(self, identifier: str, limit: int = 20) -> List[Match]:
+    def get_matches(self, identifier: str, limit: int = 20) -> list[Match]:
         token = self._get_token()
         user = self._fetch_user(identifier, token)
         scores = self.http.request(
@@ -215,7 +215,7 @@ class OsuIntegration(GameIntegration):
         )
         return self._build_matches(scores, limit) # type: ignore
 
-    async def get_matches_async(self, identifier: str, limit: int = 20) -> List[Match]:
+    async def get_matches_async(self, identifier: str, limit: int = 20) -> list[Match]:
         token = await self._get_token_async()
         user = await self._fetch_user_async(identifier, token)
         scores = await self.http.request_async(
@@ -226,8 +226,8 @@ class OsuIntegration(GameIntegration):
         )
         return self._build_matches(scores, limit) # type: ignore
 
-    def _build_matches(self, scores: List[Dict[str, Any]], limit: int) -> List[Match]:
-        matches: List[Match] = []
+    def _build_matches(self, scores: list[dict[str, Any]], limit: int) -> list[Match]:
+        matches: list[Match] = []
         for raw in scores[:limit]:
             played_at = None
             created_at = raw.get("created_at")
@@ -266,7 +266,7 @@ class OsuIntegration(GameIntegration):
 
     # -- Leaderboard ------------------------------------------------------
 
-    def get_leaderboard(self, region: Optional[str] = None) -> Leaderboard:
+    def get_leaderboard(self, region: str | None = None) -> Leaderboard:
         token = self._get_token()
         params = {"country": region} if region else None
         payload = self.http.request(
@@ -274,7 +274,7 @@ class OsuIntegration(GameIntegration):
         )
         return self._build_leaderboard(payload, region)
 
-    async def get_leaderboard_async(self, region: Optional[str] = None) -> Leaderboard:
+    async def get_leaderboard_async(self, region: str | None = None) -> Leaderboard:
         token = await self._get_token_async()
         params = {"country": region} if region else None
         payload = await self.http.request_async(
@@ -282,7 +282,7 @@ class OsuIntegration(GameIntegration):
         )
         return self._build_leaderboard(payload, region)
 
-    def _build_leaderboard(self, payload: Dict[str, Any], region: Optional[str]) -> Leaderboard:
+    def _build_leaderboard(self, payload: dict[str, Any], region: str | None) -> Leaderboard:
         rows = payload.get("ranking", [])
         entries = [
             LeaderboardEntry(

@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import random
 import time
-from typing import Any, Dict, Optional
+from typing import Any
 
 import httpx
 
@@ -28,15 +28,15 @@ class HTTPClient:
 
     def __init__(
         self,
-        base_headers: Optional[Dict[str, str]] = None,
+        base_headers: dict[str, str] | None = None,
         timeout: float = DEFAULT_TIMEOUT,
         max_retries: int = DEFAULT_MAX_RETRIES,
     ) -> None:
         self.base_headers = base_headers or {}
         self.timeout = timeout
         self.max_retries = max_retries
-        self._sync_client: Optional[httpx.Client] = None
-        self._async_client: Optional[httpx.AsyncClient] = None
+        self._sync_client: httpx.Client | None = None
+        self._async_client: httpx.AsyncClient | None = None
 
     @property
     def _sync(self) -> httpx.Client:
@@ -64,7 +64,7 @@ class HTTPClient:
             await self._async_client.aclose()
             self._async_client = None
 
-    def _merged_headers(self, extra: Optional[Dict[str, str]]) -> Dict[str, str]:
+    def _merged_headers(self, extra: dict[str, str] | None) -> dict[str, str]:
         headers = dict(self.base_headers)
         if extra:
             headers.update(extra)
@@ -72,19 +72,21 @@ class HTTPClient:
 
     @staticmethod
     def _backoff_delay(attempt: int) -> float:
-        return DEFAULT_BACKOFF_BASE * (2 ** attempt) + random.uniform(0, 0.1)
+        base_delay: float = DEFAULT_BACKOFF_BASE * (2**attempt)
+        return base_delay + random.uniform(0, 0.1)
 
     @staticmethod
-    def _retry_after_seconds(response: httpx.Response) -> Optional[float]:
+    def _retry_after_seconds(response: httpx.Response) -> float | None:
         header = response.headers.get("Retry-After")
         if header is None:
             return None
         try:
-            return float(header)
+            result: float = float(header)
+            return result
         except ValueError:
             return None
 
-    def _handle_response(self, response: httpx.Response) -> Dict[str, Any]:
+    def _handle_response(self, response: httpx.Response) -> dict[str, Any]:
         if response.status_code in (401, 403):
             raise AuthenticationError(
                 f"Authentication failed with status {response.status_code}."
@@ -104,11 +106,12 @@ class HTTPClient:
                 f"The upstream API returned an unexpected status: {response.status_code}."
             )
         try:
-            return response.json()
+            result: dict[str, Any] = response.json()
+            return result
         except ValueError as exc:
             raise InvalidResponseError("Response body was not valid JSON.") from exc
 
-    def _sleep_for_retry(self, attempt: int, response: Optional[httpx.Response]) -> None:
+    def _sleep_for_retry(self, attempt: int, response: httpx.Response | None) -> None:
         retry_after = None
         if response is not None:
             retry_after = self._retry_after_seconds(response)
@@ -116,7 +119,7 @@ class HTTPClient:
         time.sleep(delay)
 
     async def _async_sleep_for_retry(
-        self, attempt: int, response: Optional[httpx.Response]
+        self, attempt: int, response: httpx.Response | None
     ) -> None:
         retry_after = None
         if response is not None:
@@ -129,15 +132,15 @@ class HTTPClient:
         method: str,
         url: str,
         *,
-        params: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, str]] = None,
-        json: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+        json: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         merged_headers = self._merged_headers(headers)
-        last_exc: Optional[Exception] = None
+        last_exc: Exception | None = None
 
         for attempt in range(self.max_retries + 1):
-            response: Optional[httpx.Response] = None
+            response: httpx.Response | None = None
             try:
                 response = self._sync.request(
                     method, url, params=params, headers=merged_headers, json=json
@@ -169,15 +172,15 @@ class HTTPClient:
         method: str,
         url: str,
         *,
-        params: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, str]] = None,
-        json: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+        json: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         merged_headers = self._merged_headers(headers)
-        last_exc: Optional[Exception] = None
+        last_exc: Exception | None = None
 
         for attempt in range(self.max_retries + 1):
-            response: Optional[httpx.Response] = None
+            response: httpx.Response | None = None
             try:
                 response = await self._async.request(
                     method, url, params=params, headers=merged_headers, json=json

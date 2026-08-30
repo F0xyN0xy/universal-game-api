@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 
 class MemoryCache:
@@ -11,9 +11,9 @@ class MemoryCache:
 
     def __init__(self, default_ttl: float = 60.0) -> None:
         self.default_ttl = default_ttl
-        self._store: Dict[str, Tuple[float, Any]] = {}
+        self._store: dict[str, tuple[float, Any]] = {}
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """Return the cached value for ``key``, or ``None`` if missing/expired."""
         entry = self._store.get(key)
         if entry is None:
@@ -24,7 +24,7 @@ class MemoryCache:
             return None
         return value
 
-    def set(self, key: str, value: Any, ttl: Optional[float] = None) -> None:
+    def set(self, key: str, value: Any, ttl: float | None = None) -> None:
         """Store ``value`` under ``key`` for ``ttl`` seconds."""
         effective_ttl = self.default_ttl if ttl is None else ttl
         self._store[key] = (time.monotonic() + effective_ttl, value)

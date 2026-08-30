@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Dict, Type
-
 from .base import GameIntegration
 from .chess_com.client import ChessComIntegration
 from .lichess.client import LichessIntegration
 from .osu.client import OsuIntegration
 
-GAME_REGISTRY: Dict[str, Type[GameIntegration]] = {
+GAME_REGISTRY: dict[str, type[GameIntegration]] = {
     ChessComIntegration.slug: ChessComIntegration,
     LichessIntegration.slug: LichessIntegration,
     OsuIntegration.slug: OsuIntegration,
@@ -21,7 +19,7 @@ def supported_games() -> list[str]:
     return sorted(GAME_REGISTRY.keys())
 
 
-def register_game(integration_cls: Type[GameIntegration]) -> Type[GameIntegration]:
+def register_game(integration_cls: type[GameIntegration]) -> type[GameIntegration]:
     """Register a new game integration class."""
     GAME_REGISTRY[integration_cls.slug] = integration_cls
     return integration_cls

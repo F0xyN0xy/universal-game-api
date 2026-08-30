@@ -1,5 +1,9 @@
 # Universal Game API (`gameapi`)
 
+[![PyPI version](https://badge.fury.io/py/universal-game-api.svg)](https://pypi.org/project/universal-game-api/)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 > One interface. Every game. No API archaeology.
 
 `gameapi` is a Python library that unifies public game APIs behind a single, consistent interface. Instead of learning a new client for every game, you write the same code for Chess.com, Lichess, and whatever comes next.
@@ -206,6 +210,25 @@ from gameapi import (
     InvalidResponseError,
 )
 ```
+
+---
+
+## Type Safety
+
+`gameapi` is fully typed and passes `mypy --strict` with zero errors. All public APIs have complete type annotations using modern Python 3.9+ syntax:
+
+```python
+from gameapi import GameAPI, Player
+
+api: GameAPI = GameAPI()
+player: Player = api.player(game="chess_com", identifier="hikaru")
+
+# IDE autocomplete works perfectly
+rating: float | None = player.rank.rating
+games: int | None = player.stats.games_played
+```
+
+Type stubs are included in the package for optimal IDE support.
 
 ---
 

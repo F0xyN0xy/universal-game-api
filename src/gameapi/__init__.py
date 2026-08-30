@@ -25,24 +25,24 @@ from .exceptions import (
 from .games.registry import supported_games
 from .models import Leaderboard, LeaderboardEntry, Match, Player, PlayerStats, Rank
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 __all__ = [
-    "GameAPI",
+    "APIUnavailableError",
     "AsyncGameAPI",
-    "Player",
-    "PlayerStats",
-    "Rank",
-    "Match",
-    "Leaderboard",
-    "LeaderboardEntry",
+    "AuthenticationError",
+    "GameAPI",
     "GameAPIError",
     "GameNotSupportedError",
-    "PlayerNotFoundError",
-    "AuthenticationError",
-    "RateLimitError",
-    "APIUnavailableError",
     "InvalidResponseError",
-    "supported_games",
+    "Leaderboard",
+    "LeaderboardEntry",
+    "Match",
+    "Player",
+    "PlayerNotFoundError",
+    "PlayerStats",
+    "Rank",
+    "RateLimitError",
     "__version__",
+    "supported_games",
 ]

@@ -3,33 +3,32 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, Optional
 
 
 @dataclass
 class ChessComRatingSummary:
-    rating: Optional[int] = None
-    wins: Optional[int] = None
-    losses: Optional[int] = None
-    draws: Optional[int] = None
+    rating: int | None = None
+    wins: int | None = None
+    losses: int | None = None
+    draws: int | None = None
 
 
 @dataclass
 class ChessComPlayerData:
-    title: Optional[str] = None
-    country: Optional[str] = None
-    followers: Optional[int] = None
-    joined_timestamp: Optional[int] = None
-    league: Optional[str] = None
-    ratings: Dict[str, ChessComRatingSummary] = field(default_factory=dict)
-    puzzle_rush_best: Optional[int] = None
+    title: str | None = None
+    country: str | None = None
+    followers: int | None = None
+    joined_timestamp: int | None = None
+    league: str | None = None
+    ratings: dict[str, ChessComRatingSummary] = field(default_factory=dict)
+    puzzle_rush_best: int | None = None
 
 
 @dataclass
 class ChessComMatchData:
-    time_class: Optional[str] = None
-    white: Optional[str] = None
-    black: Optional[str] = None
-    white_result: Optional[str] = None
-    black_result: Optional[str] = None
-    pgn_url: Optional[str] = None
+    time_class: str | None = None
+    white: str | None = None
+    black: str | None = None
+    white_result: str | None = None
+    black_result: str | None = None
+    pgn_url: str | None = None

@@ -9,7 +9,7 @@ sponsored by Chess.com.
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ...exceptions import InvalidResponseError, PlayerNotFoundError
 from ...models import Leaderboard, LeaderboardEntry, Match, Player, PlayerStats, Rank
@@ -17,7 +17,7 @@ from ..base import GameIntegration
 from . import endpoints
 from .models import ChessComMatchData, ChessComPlayerData, ChessComRatingSummary
 
-_USER_AGENT = "gameapi/0.2.0 (+https://github.com/F0xyN0xy/universal-game-api)"
+_USER_AGENT = "gameapi/0.2.1 (+https://github.com/F0xyN0xy/universal-game-api)"
 
 _TIME_CONTROL_KEYS = {
     "chess_bullet": "bullet",
@@ -38,7 +38,7 @@ class ChessComIntegration(GameIntegration):
     source_name = "Chess.com Published-Data API"
     source_url = "https://www.chess.com/news/view/published-data-api"
 
-    def _headers(self) -> Dict[str, str]:
+    def _headers(self) -> dict[str, str]:
         return {"User-Agent": _USER_AGENT, "Accept": "application/json"}
 
     def get_player(self, identifier: str) -> Player:
@@ -63,7 +63,7 @@ class ChessComIntegration(GameIntegration):
         self._cache_set(f"player:{identifier}", player, ttl=60)
         return player
 
-    def _fetch_profile(self, identifier: str) -> Dict[str, Any]:
+    def _fetch_profile(self, identifier: str) -> dict[str, Any]:
         try:
             return self.http.request(
                 "GET", endpoints.player_profile_url(identifier), headers=self._headers()
@@ -71,7 +71,7 @@ class ChessComIntegration(GameIntegration):
         except InvalidResponseError as exc:
             raise PlayerNotFoundError(self.slug, identifier) from exc
 
-    async def _fetch_profile_async(self, identifier: str) -> Dict[str, Any]:
+    async def _fetch_profile_async(self, identifier: str) -> dict[str, Any]:
         try:
             return await self.http.request_async(
                 "GET", endpoints.player_profile_url(identifier), headers=self._headers()
@@ -79,7 +79,7 @@ class ChessComIntegration(GameIntegration):
         except InvalidResponseError as exc:
             raise PlayerNotFoundError(self.slug, identifier) from exc
 
-    def _fetch_stats(self, identifier: str) -> Dict[str, Any]:
+    def _fetch_stats(self, identifier: str) -> dict[str, Any]:
         try:
             return self.http.request(
                 "GET", endpoints.player_stats_url(identifier), headers=self._headers()
@@ -87,7 +87,7 @@ class ChessComIntegration(GameIntegration):
         except InvalidResponseError:
             return {}
 
-    async def _fetch_stats_async(self, identifier: str) -> Dict[str, Any]:
+    async def _fetch_stats_async(self, identifier: str) -> dict[str, Any]:
         try:
             return await self.http.request_async(
                 "GET", endpoints.player_stats_url(identifier), headers=self._headers()
@@ -96,9 +96,9 @@ class ChessComIntegration(GameIntegration):
             return {}
 
     def _build_player(
-        self, identifier: str, profile: Dict[str, Any], stats: Dict[str, Any]
+        self, identifier: str, profile: dict[str, Any], stats: dict[str, Any]
     ) -> Player:
-        ratings: Dict[str, ChessComRatingSummary] = {}
+        ratings: dict[str, ChessComRatingSummary] = {}
         total_wins = total_losses = total_draws = 0
         has_record = False
 
@@ -161,9 +161,9 @@ class ChessComIntegration(GameIntegration):
             avatar_url=profile.get("avatar"),
         )
 
-    def get_matches(self, identifier: str, limit: int = 20) -> List[Match]:
+    def get_matches(self, identifier: str, limit: int = 20) -> list[Match]:
         archives = self._fetch_archives(identifier)
-        games: List[Dict[str, Any]] = []
+        games: list[dict[str, Any]] = []
         for archive_url in reversed(archives):
             if len(games) >= limit:
                 break
@@ -171,9 +171,9 @@ class ChessComIntegration(GameIntegration):
             games.extend(payload.get("games", []))
         return self._build_matches(identifier, games, limit)
 
-    async def get_matches_async(self, identifier: str, limit: int = 20) -> List[Match]:
+    async def get_matches_async(self, identifier: str, limit: int = 20) -> list[Match]:
         archives = await self._fetch_archives_async(identifier)
-        games: List[Dict[str, Any]] = []
+        games: list[dict[str, Any]] = []
         for archive_url in reversed(archives):
             if len(games) >= limit:
                 break
@@ -181,28 +181,30 @@ class ChessComIntegration(GameIntegration):
             games.extend(payload.get("games", []))
         return self._build_matches(identifier, games, limit)
 
-    def _fetch_archives(self, identifier: str) -> List[str]:
+    def _fetch_archives(self, identifier: str) -> list[str]:
         try:
             payload = self.http.request(
                 "GET", endpoints.player_archives_url(identifier), headers=self._headers()
             )
         except InvalidResponseError as exc:
             raise PlayerNotFoundError(self.slug, identifier) from exc
-        return payload.get("archives", [])
+        result: list[str] = payload.get("archives", [])
+        return result
 
-    async def _fetch_archives_async(self, identifier: str) -> List[str]:
+    async def _fetch_archives_async(self, identifier: str) -> list[str]:
         try:
             payload = await self.http.request_async(
                 "GET", endpoints.player_archives_url(identifier), headers=self._headers()
             )
         except InvalidResponseError as exc:
             raise PlayerNotFoundError(self.slug, identifier) from exc
-        return payload.get("archives", [])
+        result: list[str] = payload.get("archives", [])
+        return result
 
     def _build_matches(
-        self, identifier: str, games: List[Dict[str, Any]], limit: int
-    ) -> List[Match]:
-        matches: List[Match] = []
+        self, identifier: str, games: list[dict[str, Any]], limit: int
+    ) -> list[Match]:
+        matches: list[Match] = []
         lowered = identifier.lower()
         for raw in reversed(games):
             if len(matches) >= limit:
@@ -236,17 +238,17 @@ class ChessComIntegration(GameIntegration):
             )
         return matches
 
-    def get_leaderboard(self, region: Optional[str] = None) -> Leaderboard:
+    def get_leaderboard(self, region: str | None = None) -> Leaderboard:
         payload = self.http.request("GET", endpoints.leaderboards_url(), headers=self._headers())
         return self._build_leaderboard(payload, region)
 
-    async def get_leaderboard_async(self, region: Optional[str] = None) -> Leaderboard:
+    async def get_leaderboard_async(self, region: str | None = None) -> Leaderboard:
         payload = await self.http.request_async(
             "GET", endpoints.leaderboards_url(), headers=self._headers()
         )
         return self._build_leaderboard(payload, region)
 
-    def _build_leaderboard(self, payload: Dict[str, Any], region: Optional[str]) -> Leaderboard:
+    def _build_leaderboard(self, payload: dict[str, Any], region: str | None) -> Leaderboard:
         rows = payload.get(_DEFAULT_LEADERBOARD_CATEGORY, [])
         entries = [
             LeaderboardEntry(
@@ -259,7 +261,7 @@ class ChessComIntegration(GameIntegration):
         return Leaderboard(game=self.slug, entries=entries, region=region)
 
 
-def _normalize_result(chess_com_result: Optional[str]) -> str:
+def _normalize_result(chess_com_result: str | None) -> str:
     if chess_com_result is None:
         return "unknown"
     if chess_com_result == "win":

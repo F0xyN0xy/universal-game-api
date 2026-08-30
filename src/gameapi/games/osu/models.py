@@ -3,43 +3,42 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional
 
 
 @dataclass
 class OsuPlayerData:
-    mode: Optional[str] = None
-    country_code: Optional[str] = None
-    global_rank: Optional[int] = None
-    country_rank: Optional[int] = None
-    hit_accuracy: Optional[float] = None
-    play_count: Optional[int] = None
-    play_time_seconds: Optional[int] = None
-    ranked_score: Optional[int] = None
-    total_score: Optional[int] = None
-    level_current: Optional[int] = None
-    level_progress: Optional[int] = None
-    ss_count: Optional[int] = None
-    s_count: Optional[int] = None
-    a_count: Optional[int] = None
-    is_supporter: Optional[bool] = None
-    follower_count: Optional[int] = None
+    mode: str | None = None
+    country_code: str | None = None
+    global_rank: int | None = None
+    country_rank: int | None = None
+    hit_accuracy: float | None = None
+    play_count: int | None = None
+    play_time_seconds: int | None = None
+    ranked_score: int | None = None
+    total_score: int | None = None
+    level_current: int | None = None
+    level_progress: int | None = None
+    ss_count: int | None = None
+    s_count: int | None = None
+    a_count: int | None = None
+    is_supporter: bool | None = None
+    follower_count: int | None = None
 
 
 @dataclass
 class OsuScoreData:
-    beatmap_id: Optional[int] = None
-    beatmapset_title: Optional[str] = None
-    beatmapset_artist: Optional[str] = None
-    difficulty_name: Optional[str] = None
-    mode: Optional[str] = None
-    mods: List[str] = None  # type: ignore[assignment]
-    grade: Optional[str] = None
-    accuracy: Optional[float] = None
-    pp: Optional[float] = None
-    max_combo: Optional[int] = None
-    score: Optional[int] = None
-    passed: Optional[bool] = None
+    beatmap_id: int | None = None
+    beatmapset_title: str | None = None
+    beatmapset_artist: str | None = None
+    difficulty_name: str | None = None
+    mode: str | None = None
+    mods: list[str] = None  # type: ignore[assignment]
+    grade: str | None = None
+    accuracy: float | None = None
+    pp: float | None = None
+    max_combo: int | None = None
+    score: int | None = None
+    passed: bool | None = None
 
     def __post_init__(self) -> None:
         if self.mods is None:

@@ -3,39 +3,38 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, Optional
 
 
 @dataclass
 class LichessRatingSummary:
-    rating: Optional[int] = None
-    rd: Optional[int] = None
-    prog: Optional[int] = None
-    games: Optional[int] = None
+    rating: int | None = None
+    rd: int | None = None
+    prog: int | None = None
+    games: int | None = None
 
 
 @dataclass
 class LichessPlayerData:
-    url: Optional[str] = None
-    playing: Optional[str] = None
-    completion_rate: Optional[int] = None
-    count_all: Optional[int] = None
-    count_rated: Optional[int] = None
-    count_ai: Optional[int] = None
-    count_draw: Optional[int] = None
-    count_loss: Optional[int] = None
-    count_win: Optional[int] = None
-    play_time_total: Optional[int] = None
-    profile: Dict[str, str] = field(default_factory=dict)
-    perfs: Dict[str, LichessRatingSummary] = field(default_factory=dict)
+    url: str | None = None
+    playing: str | None = None
+    completion_rate: int | None = None
+    count_all: int | None = None
+    count_rated: int | None = None
+    count_ai: int | None = None
+    count_draw: int | None = None
+    count_loss: int | None = None
+    count_win: int | None = None
+    play_time_total: int | None = None
+    profile: dict[str, str] = field(default_factory=dict)
+    perfs: dict[str, LichessRatingSummary] = field(default_factory=dict)
 
 
 @dataclass
 class LichessMatchData:
-    speed: Optional[str] = None
-    perf: Optional[str] = None
-    rated: Optional[bool] = None
-    status: Optional[str] = None
-    winner: Optional[str] = None
-    color: Optional[str] = None
-    opening: Optional[str] = None
+    speed: str | None = None
+    perf: str | None = None
+    rated: bool | None = None
+    status: str | None = None
+    winner: str | None = None
+    color: str | None = None
+    opening: str | None = None

@@ -16,8 +16,6 @@ Example
 
 from __future__ import annotations
 
-from typing import Optional
-
 
 class GameAPIError(Exception):
     """Base class for all errors raised by gameapi.
@@ -34,7 +32,7 @@ class GameAPIError(Exception):
 class GameNotSupportedError(GameAPIError):
     """Raised when a requested game has no registered integration."""
 
-    def __init__(self, game: str, supported: Optional[list] = None) -> None:
+    def __init__(self, game: str, supported: list[str] | None = None) -> None:
         self.game = game
         self.supported = supported or []
         supported_str = ", ".join(sorted(self.supported)) if self.supported else "none registered"
@@ -69,7 +67,7 @@ class RateLimitError(GameAPIError):
     """
 
     def __init__(
-        self, message: str = "Rate limit exceeded.", retry_after: Optional[float] = None
+        self, message: str = "Rate limit exceeded.", retry_after: float | None = None
     ) -> None:
         self.retry_after = retry_after
         super().__init__(message)
